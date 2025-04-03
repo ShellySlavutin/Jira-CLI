@@ -106,6 +106,15 @@ The script will notify you if:
 - The project name does not exist.
 - The issue creation or fetching process fails.
 
+### Assumptions and Limitations
+API Access: The script assumes you have valid Jira credentials (email and API token) and the correct permissions to access the Jira projects and issues.
+
+Project Access: The user must know the project name and issue types beforehand. The script does not validate the availability of the project until the user provides this input.
+
+Issue Type Support: The script supports basic issue types such as Bug, Task, Story, and Epic, but if your Jira setup has custom issue types, they may not be included in the available options unless they are explicitly fetched via Jira metadata.
+
+Limited Error Handling: While basic error handling for failed requests and invalid inputs is in place, more complex error scenarios (e.g., network issues, timeouts, permission errors) might not be fully addressed.
+
 ### Conclusion
 
 This simple Jira CLI tool allows users to interact with Jira, perform common tasks such as fetching issues or creating new issues directly from the command line. It integrates with Jira's REST API to perform actions dynamically.
