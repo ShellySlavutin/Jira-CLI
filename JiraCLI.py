@@ -4,6 +4,9 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 
+url = "https://shellyslavutin.atlassian.net/rest/api/2/project"
+auth = HTTPBasicAuth("shelly.slavutin@gmail.com", "ATATT3xFfGF02PcgYEg6FjivznPNLnBkScUz0dg2_oH48CGrYNHyQV-ECT_wWkrtpq7p-TYh4D8VE_kOjHombKcjlSlTXqpc7EZHSkciVHtqMjH3iUBiy4feba8K7OpbkcRFtfik8GeKpsXqziSvjVza4xw7-yz-rOJOS6h7CIb5em1_O0Zp9Jg=9459A319")
+
 template_url = "https://%s.atlassian.net/rest/api/2/project"
 
 headers = {
@@ -46,10 +49,9 @@ def setup():
     response = requests.get(url, headers=headers, auth=auth)
 
     if response.status_code >= 400:
-        print("setup failed!")
-        print("Status Code:", response.status_code)
+        print("setup failed!\n")
     else:
-        print("setup successful!")
+        print("setup successful!\n")
 
 
 def get_issue():
@@ -96,20 +98,42 @@ def create_issue():
             print("Project does not exist!")
         else:
             print("The project has been found!")
-            issueName = input("Enter issue name ")
+
             issueSummary = input("Enter issue summary ")
 
-            payload = json.dumps(
-            {
-              "fields": {
-                "project": { "key": projectKey},
-                "summary": issueSummary,
-                "issuetype": { "name": issueName}
-              }
-            } )
+            print("Available issue types: Bug, Task, Story, Epic")
+            issueType = input("Enter issue type: ")
 
-            issue_url = url + "/issue"
-            response = requests.post(url, date=payload, headers=headers, auth=auth)
+
+            payload = json.dumps( {
+                "fields": {
+                   "project":
+                   {
+                      "key": projectKey
+                   },
+                   "summary": "REST ye merry gentlemen.",
+                   "description": "Creating of an issue using project keys and issue type names using the REST API",
+                   "issuetype": {
+                      "name": "Task"
+                   }
+               }
+            }
+             )
+
+            issue_url = "https://shellyslavutin.atlassian.net/rest/api/2/issue"
+            print(issue_url)
+            response = requests.post(issue_url, data=payload, headers=headers, auth=auth)
+
+            if response.status_code == 201:
+                issue_data = response.json()
+                print(f"Issue created successfully! Issue Key: {issue_data['key']}")
+            else:
+                print(f"Failed to create issue: {response.status_code}")
+                try:
+                    print(response.json())  # Try to parse JSON
+                except requests.exceptions.JSONDecodeError:
+                    print("Response is not JSON:", response.text)  # Print raw response
+
     else:
         print(f"Failed to fetch projects: {response.status_code}")
 
