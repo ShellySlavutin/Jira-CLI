@@ -4,12 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 
-template_url = "https://%s.atlassian.net/rest/api/2/project"
-url = "https://example.atlassian.net/rest/api/2/project"
-
-userEmail = "example@email.com"
-userAPItoken = "<api_token>"
-auth = HTTPBasicAuth(userEmail, userAPItoken)
+template_url = "https://%s.atlassian.net/rest/api/2/project%s"
 
 headers = {
   "Accept": "application/json",
@@ -32,12 +27,6 @@ payload = json.dumps( {
   "url": "http://atlassian.com"
 } )
 
-response = requests.request(
-   "POST",
-   url,
-   data=payload,
-   headers=headers,
-   auth=auth)
 
 
 def setup():
@@ -47,7 +36,10 @@ def setup():
     userDomain = input("Please enter your domain, for example : mydomainname ")
     userAPItoken = input("Please enter your API token ")
 
+    global url
     url = template_url % userDomain
+
+    global auth
     auth = HTTPBasicAuth(userEmail, userAPItoken)
 
     print("checking validity of the setup...")
@@ -61,7 +53,18 @@ def setup():
 
 
 def get_issue():
-    return "test"
+    print("Hello! you have chosen the get issue option\n")
+    userProject = input("Please enter your project name ")
+
+    print("checking validity of project setup...")
+    response = requests.get(url, headers=headers, auth=auth)
+
+    if response.status_code >= 400:
+        print("setup failed!")
+        print("Status Code:", response.status_code)
+    else:
+        print("setup successful!")
+
 
 def create_issue():
     return "test"
