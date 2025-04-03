@@ -4,7 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 
-template_url = "https://%s.atlassian.net/rest/api/2/project%s"
+template_url = "https://%s.atlassian.net/rest/api/2/project"
 
 headers = {
   "Accept": "application/json",
@@ -32,9 +32,9 @@ payload = json.dumps( {
 def setup():
     print("Hello! you have chosen the setup option\n"
           "Here we will configure you to your Jira account\n")
-    userEmail = input("Please enter your email, for example : example@gmail.com ")
-    userDomain = input("Please enter your domain, for example : mydomainname ")
-    userAPItoken = input("Please enter your API token ")
+    userEmail = input("Please enter your email, for example : example@gmail.com ")  # shelly.slavutin@gmail.com
+    userDomain = input("Please enter your domain, for example : mydomainname ")  # shellyslavutin
+    userAPItoken = input("Please enter your API token ")  # ATATT3xFfGF02PcgYEg6FjivznPNLnBkScUz0dg2_oH48CGrYNHyQV-ECT_wWkrtpq7p-TYh4D8VE_kOjHombKcjlSlTXqpc7EZHSkciVHtqMjH3iUBiy4feba8K7OpbkcRFtfik8GeKpsXqziSvjVza4xw7-yz-rOJOS6h7CIb5em1_O0Zp9Jg=9459A319
 
     global url
     url = template_url % userDomain
@@ -55,15 +55,28 @@ def setup():
 def get_issue():
     print("Hello! you have chosen the get issue option\n")
     userProject = input("Please enter your project name ")
+    projectKey = None
+    projectID = None
 
-    print("checking validity of project setup...")
     response = requests.get(url, headers=headers, auth=auth)
 
-    if response.status_code >= 400:
-        print("setup failed!")
-        print("Status Code:", response.status_code)
+    if response.status_code == 200:
+        projects = response.json()
+        for project in projects:
+            if project['name'] == userProject:
+                projectKey = project['key']
+                projectID = project['id']
+        if projectKey == None or projectID == None:
+            print("Project does not exist!")
+        else:
+            print("The project has been found!")
+            issueName = input("Enter issue name ")
+            issue_url = url + "/" + projectID + "/" + issueName
+            response = requests.get(url, headers=headers, auth=auth)
+            print(json.dumps(json.loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
     else:
-        print("setup successful!")
+        print(f"Failed to fetch projects: {response.status_code}")
+        print(response.json())
 
 
 def create_issue():
