@@ -76,11 +76,43 @@ def get_issue():
             print(json.dumps(json.loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
     else:
         print(f"Failed to fetch projects: {response.status_code}")
-        print(response.json())
 
 
 def create_issue():
-    return "test"
+    print("Hello! you have chosen the create issue option\n")
+    userProject = input("Please enter your project name ")
+    projectKey = None
+    projectID = None
+
+    response = requests.get(url, headers=headers, auth=auth)
+
+    if response.status_code == 200:
+        projects = response.json()
+        for project in projects:
+            if project['name'] == userProject:
+                projectKey = project['key']
+                projectID = project['id']
+        if projectKey == None or projectID == None:
+            print("Project does not exist!")
+        else:
+            print("The project has been found!")
+            issueName = input("Enter issue name ")
+            issueSummary = input("Enter issue summary ")
+
+            payload = json.dumps(
+            {
+              "fields": {
+                "project": { "key": projectKey},
+                "summary": issueSummary,
+                "issuetype": { "name": issueName}
+              }
+            } )
+
+            issue_url = url + "/issue"
+            response = requests.post(url, date=payload, headers=headers, auth=auth)
+    else:
+        print(f"Failed to fetch projects: {response.status_code}")
+
 
 def switch_case(case):
     """
